@@ -1,18 +1,17 @@
 defmodule Hangman do
-  @moduledoc """
-  Documentation for Hangman.
-  """
+  use Application
 
-  @doc """
-  Hello world.
-
-  ## Examples
-
-      iex> Hangman.hello
-      :world
-
-  """
   def start do
-    Hangman.Game.start()
+    import Supervisor.Spec
+
+    children = [
+      supervisor(Hangman.Game.Supervisor, []),
+      supervisor(Registry, [:unique, Hangman.Registry]),
+      worker(Hangman.Game.Interface, [])
+    ]
+  end
+
+  def game(name) do
+    {:via, Registry, {Hangman.Registry, name}}
   end
 end
